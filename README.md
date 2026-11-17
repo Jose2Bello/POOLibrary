@@ -5,58 +5,43 @@ sin modificar el código base de la librería.
 
 ## Estado
 
-Proyecto en fase de implementación inicial. La API pública y las pruebas se
-encuentran en construcción.
-
-## Objetivos
-
-- Representar un archivo CSV mediante un objeto con datos de tipo `String`.
-- Agregar y quitar filas o columnas.
-- Imprimir la tabla en consola.
-- Permitir extensiones propias mediante interfaces y composición.
-- Aplicar los principios SOLID.
-- Documentar el diseño, los patrones y la forma de extender la librería.
+Proyecto en desarrollo. La API del núcleo está definida y el resto de módulos se
+integra por partes mediante Pull Requests.
 
 ## Funcionalidades
 
 - Cargar un CSV desde un archivo o desde un texto.
-- Acceder a filas, columnas, celdas y encabezados.
+- Representar filas, columnas, celdas y encabezados como `String`.
 - Agregar, eliminar y modificar filas.
 - Agregar, eliminar y modificar columnas.
-- Imprimir la tabla con formato de texto.
+- Imprimir la tabla en consola.
 - Cambiar el formato de salida sin modificar la librería.
 - Cambiar el destino de impresión: consola, archivo o memoria.
 - Aplicar transformaciones propias mediante decoradores.
-- Cambiar la forma de parsear el CSV mediante una nueva implementación de `CsvParser`.
+- Cambiar el parseo del CSV con una nueva implementación de `CsvParser`.
 
 ## Stack
 
 - Java 21.
-- Maven como herramienta de construcción y dependencias.
-- JUnit 5 para pruebas.
+- Maven Wrapper y JUnit 5.
 - Parser CSV propio.
-- Datos representados como `String`.
 
 ## Construcción y pruebas
 
-El repositorio incluye Maven Wrapper, por lo que no es necesario instalar Maven.
+No es necesario instalar Maven.
 
 Windows:
 
 ```powershell
 .\mvnw.cmd test
+.\mvnw.cmd clean package
 ```
 
 Linux o macOS:
 
 ```bash
 ./mvnw test
-```
-
-Para generar el `.jar`:
-
-```powershell
-.\mvnw.cmd clean package
+./mvnw clean package
 ```
 
 ## Arquitectura
@@ -68,7 +53,7 @@ com.equipo.csv
 ├── decorator    → extensiones de tabla
 ├── source       → orígenes de datos
 ├── exception    → excepciones propias
-└── examples     → ejemplos de uso y extensión
+└── examples     → ejemplos de uso
 ```
 
 ### Interfaces principales
@@ -82,28 +67,31 @@ com.equipo.csv
 - `TablePrinter`: salida del texto generado.
 - `TableDecoratorFactory`: creación de decoradores de tabla.
 
-### Principios SOLID
+### SOLID
 
-- **SRP:** cada clase tiene una sola responsabilidad: parsear, almacenar, formatear, imprimir o coordinar.
-- **OCP:** se pueden agregar nuevos parsers, formateadores, impresores o decoradores sin modificar las clases existentes.
-- **LSP:** las implementaciones y decoradores de `CsvTable` pueden sustituirse entre sí sin romper el contrato.
-- **ISP:** `CsvTable` es de solo lectura; `MutableCsvTable` agrega escritura; formateador e impresor están separados.
-- **DIP:** `CsvDocument` depende de interfaces, no de clases concretas.
+| Principio | Aplicación |
+|---|---|
+| SRP | Parsear, almacenar, formatear, imprimir y coordinar son responsabilidades separadas. |
+| OCP | Nuevos parsers, formateadores, impresores o decoradores se agregan sin modificar el núcleo. |
+| LSP | Las implementaciones y decoradores de `CsvTable` son sustituibles entre sí. |
+| ISP | `CsvTable` es de solo lectura; `MutableCsvTable` agrega escritura; formato e impresión están separados. |
+| DIP | `CsvDocument` depende de interfaces, no de clases concretas. |
 
-### Patrones utilizados
+### Patrones
 
-- **Strategy:** `CsvParser`, `TableFormatter` y `TablePrinter`.
-- **Builder:** `CsvDocumentBuilder`.
-- **Decorator:** transformaciones como recortar espacios, convertir a mayúsculas o filtrar filas.
-- **Facade:** `CsvDocument` como objeto principal de uso.
-- **Factory Method:** `CsvDocument.builder()` y `CsvLibrary`.
-- **Adapter:** adaptación de archivos y textos a `CsvSource`.
+| Patrón | Uso |
+|---|---|
+| Strategy | `CsvParser`, `TableFormatter` y `TablePrinter`. |
+| Builder | `CsvDocumentBuilder`. |
+| Decorator | Transformaciones de tabla como recortar, mayúsculas o filtrar filas. |
+| Facade | `CsvDocument` como objeto principal. |
+| Factory Method | `CsvDocument.builder()` y `CsvLibrary`. |
+| Adapter | `PathCsvSource` y `StringCsvSource`. |
 
 ## Uso
 
 ```java
 import com.equipo.csv.core.CsvDocument;
-import com.equipo.csv.core.CsvLibrary;
 import com.equipo.csv.decorator.UppercaseTableDecorator;
 
 import java.nio.file.Path;
@@ -119,21 +107,11 @@ documento.removeColumn(2);
 documento.printTable();
 ```
 
-También se puede cargar desde un texto:
+También se puede cargar desde texto con `CsvLibrary.parse(...)`.
 
-```java
-CsvDocument documento = CsvLibrary.parse("""
-        Nombre,Edad,Ciudad
-        Ana,30,Madrid
-        Luis,25,Bogota
-        """);
+## Extensión
 
-documento.printTable();
-```
-
-## Extensión sin modificar la librería
-
-### Nuevo decorador
+Un decorador propio se crea extendiendo `AbstractTableDecorator`:
 
 ```java
 import com.equipo.csv.api.CsvTable;
@@ -153,7 +131,7 @@ public class MaskEmailDecorator extends AbstractTableDecorator {
 }
 ```
 
-Uso:
+Se aplica sin modificar la librería:
 
 ```java
 CsvDocument documento = CsvDocument.builder()
@@ -164,43 +142,12 @@ CsvDocument documento = CsvDocument.builder()
 documento.printTable();
 ```
 
-### Nuevo formateador
+Otros puntos de extensión:
 
-```java
-public class MarkdownTableFormatter implements TableFormatter {
-
-    @Override
-    public String format(CsvTable table) {
-        // Convertir la tabla a una tabla Markdown.
-        return "...";
-    }
-}
-```
-
-### Nuevo impresor
-
-```java
-public class FileTablePrinter implements TablePrinter {
-
-    @Override
-    public void print(String text) {
-        // Escribir el texto en un archivo.
-    }
-}
-```
-
-### Nuevo parser
-
-```java
-public class SemicolonCsvParser implements CsvParser {
-
-    @Override
-    public List<List<String>> parse(Reader reader) throws IOException {
-        // Parsear un CSV separado por punto y coma.
-        return List.of();
-    }
-}
-```
+- `TableFormatter` para Markdown, HTML o JSON.
+- `TablePrinter` para archivo o memoria.
+- `CsvParser` para otro delimitador o formato.
+- `TableDecoratorFactory` para transformaciones adicionales.
 
 ## Estructura del repositorio
 
@@ -208,8 +155,9 @@ public class SemicolonCsvParser implements CsvParser {
 POOLibrary/
 ├── pom.xml
 ├── README.md
-├── .gitignore
-├── LICENSE
+├── mvnw
+├── mvnw.cmd
+├── .mvn/
 ├── src/
 │   ├── main/java/com/equipo/csv/
 │   │   ├── api/
@@ -227,49 +175,17 @@ POOLibrary/
     └── diagrama-clases.md
 ```
 
-## Equipo y distribución del trabajo
+## Equipo y pendientes
 
-| Integrante | Rol principal | Entregables | Carga |
-|---|---|---|---|
-| José Bello | Arquitectura y núcleo | Estructura del proyecto, interfaces, `DefaultCsvTable`, parser base, `CsvDocument`, `CsvDocumentBuilder`, integración, JavaDoc y revisión de PR | 35% |
-| Integrante 2 | Pruebas de entrada y calidad | Pruebas de `SimpleCsvParser`, `DefaultCsvReader` y `DefaultCsvTable`, casos límite, parser de ejemplo con otro delimitador, sección de pruebas del informe | 33% |
-| Integrante 3 | Salida, extensiones y documentación | `MarkdownTableFormatter`, `FileTablePrinter`, pruebas de decoradores, ejemplo de extensión, diagrama de clases y sección de patrones del informe | 32% |
-
-La diferencia de carga corresponde a la integración y revisión general del
-repositorio. Todas las secciones del informe se revisan en conjunto.
-
-### Distribución del informe
-
-- **José:** introducción, arquitectura, explicación de SOLID y conclusiones.
-- **Integrante 2:** carga y parseo del CSV, pruebas, LSP y resultados.
-- **Integrante 3:** patrones de diseño, extensibilidad, diagrama de clases y guía de extensión.
-
-## Tareas pendientes
-
-- [ ] Pruebas unitarias de `SimpleCsvParser` y `DefaultCsvReader` — Integrante 2.
-- [ ] Pruebas de `DefaultCsvTable` y validación de índices — Integrante 2.
-- [ ] Pruebas de decoradores y sustitución por `CsvTable` (LSP) — Integrante 3.
-- [ ] `MarkdownTableFormatter` — Integrante 3.
-- [ ] `FileTablePrinter` — Integrante 3.
-- [ ] `SemicolonCsvParser` de ejemplo — Integrante 2.
-- [ ] `docs/informe.md` — todo el equipo.
-- [ ] `docs/diagrama-clases.puml` y su imagen — Integrante 3.
-- [ ] Completar JavaDoc de la API pública — José.
-- [ ] Ejecutar `.\mvnw.cmd test` y actualizar este README — José.
-- [ ] Crear las ramas y Pull Requests — todo el equipo.
+| Integrante | Pendientes principales |
+|---|---|
+| José | Subir parser, documento y extensiones; completar JavaDoc; escribir introducción, arquitectura y SOLID del informe; revisar PRs. |
+| Integrante 2 | Pruebas de parser, lector y tabla; crear `SemicolonCsvParser`; escribir pruebas y LSP en el informe. |
+| Integrante 3 | Crear `MarkdownTableFormatter` y `FileTablePrinter`; probar decoradores; hacer el diagrama y la sección de patrones. |
 
 ## Reglas de colaboración
 
 - No hacer commits directamente sobre `main`.
-- Crear una rama por funcionalidad: `feature/core`, `feature/parser`, `feature/output`.
-- Cada cambio se integra mediante Pull Request.
-- Ejecutar `.\mvnw.cmd test` en Windows o `./mvnw test` en Linux/macOS antes de abrir un PR.
+- Usar una rama por funcionalidad y abrir un Pull Request.
+- Ejecutar `.\mvnw.cmd test` o `./mvnw test` antes del PR.
 - Mantener el README actualizado si cambia la API.
-- Revisar el código de otro integrante antes de fusionar.
-
-## Documentación
-
-- `README.md`: uso y extensión de la librería.
-- `docs/informe.md`: informe del proyecto.
-- `docs/diagrama-clases.md`: diagrama de clases en Mermaid.
-- `docs/diagrama-clases.puml`: fuente editable del diagrama en PlantUML.
