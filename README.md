@@ -37,6 +37,28 @@ encuentran en construcción.
 - Parser CSV propio.
 - Datos representados como `String`.
 
+## Construcción y pruebas
+
+El repositorio incluye Maven Wrapper, por lo que no es necesario instalar Maven.
+
+Windows:
+
+```powershell
+.\mvnw.cmd test
+```
+
+Linux o macOS:
+
+```bash
+./mvnw test
+```
+
+Para generar el `.jar`:
+
+```powershell
+.\mvnw.cmd clean package
+```
+
 ## Arquitectura
 
 ```text
@@ -233,7 +255,7 @@ repositorio. Todas las secciones del informe se revisan en conjunto.
 - [ ] `docs/informe.md` — todo el equipo.
 - [ ] `docs/diagrama-clases.puml` y su imagen — Integrante 3.
 - [ ] Completar JavaDoc de la API pública — José.
-- [ ] Ejecutar `mvn test` y actualizar este README — José.
+- [ ] Ejecutar `.\mvnw.cmd test` y actualizar este README — José.
 - [ ] Crear las ramas y Pull Requests — todo el equipo.
 
 ## Reglas de colaboración
@@ -241,7 +263,7 @@ repositorio. Todas las secciones del informe se revisan en conjunto.
 - No hacer commits directamente sobre `main`.
 - Crear una rama por funcionalidad: `feature/core`, `feature/parser`, `feature/output`.
 - Cada cambio se integra mediante Pull Request.
-- Ejecutar `mvn test` antes de abrir un PR.
+- Ejecutar `.\mvnw.cmd test` en Windows o `./mvnw test` en Linux/macOS antes de abrir un PR.
 - Mantener el README actualizado si cambia la API.
 - Revisar el código de otro integrante antes de fusionar.
 
