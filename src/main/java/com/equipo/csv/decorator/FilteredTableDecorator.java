@@ -1,0 +1,43 @@
+package com.equipo.csv.decorator;
+
+import com.equipo.csv.api.CsvTable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+
+/**
+ * Oculta las filas que no cumplen un predicado.
+ */
+public class FilteredTableDecorator extends AbstractTableDecorator {
+
+    private final List<Integer> visibleRows;
+
+    public FilteredTableDecorator(CsvTable delegate, Predicate<List<String>> predicate) {
+        super(delegate);
+        Objects.requireNonNull(predicate, "predicate");
+
+        this.visibleRows = new ArrayList<>();
+        for (int row = 0; row < delegate.rowCount(); row++) {
+            if (predicate.test(delegate.row(row))) {
+                visibleRows.add(row);
+            }
+        }
+    }
+
+    @Override
+    public int rowCount() {
+        return visibleRows.size();
+    }
+
+    @Override
+    public String cell(int row, int column) {
+        return delegate.cell(visibleRows.get(row), column);
+    }
+
+    @Override
+    public List<String> row(int row) {
+        return delegate.row(visibleRows.get(row));
+    }
+}
