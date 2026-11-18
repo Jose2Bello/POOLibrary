@@ -88,6 +88,11 @@ com.equipo.csv
 | Factory Method | `CsvDocument.builder()` y `CsvLibrary`. |
 | Adapter | `PathCsvSource` y `StringCsvSource`. |
 
+## Diagrama de clases
+
+El diagrama editable está en `docs/diagrama-clases.drawio` y se abre con
+[draw.io](https://app.diagrams.net/) o la aplicación de escritorio.
+
 ## Uso
 
 ```java
@@ -171,8 +176,7 @@ POOLibrary/
 │       └── resources/
 └── docs/
     ├── informe.md
-    ├── diagrama-clases.puml
-    └── diagrama-clases.md
+    └── diagrama-clases.drawio
 ```
 
 ## Equipo y pendientes
