@@ -6,6 +6,47 @@ está en `git log`.
 
 ## 2026-11-20
 
+### Suite de pruebas
+
+- Se creó `src/test` con 89 casos en JUnit 5, todos en verde con
+  `.\mvnw.cmd test`:
+  - `SimpleCsvParserTest`: comillas, comas dentro de comillas, comillas
+    escapadas, saltos de línea dentro de un campo, BOM, delimitador `;`, CSV
+    vacío, líneas vacías, campo vacío final, CRLF y comilla sin cerrar.
+  - `DefaultCsvReaderTest`: encabezado opcional, encabezados generados, relleno
+    de filas desiguales, CSV vacío, solo encabezado y error de la fuente.
+  - `DefaultCsvTableTest`: lectura de datos, copias inmutables, alta y baja de
+    filas y columnas, `setCell` e índices fuera de rango.
+  - `PlainTableFormatterTest`: bordes, alineación, tabla sin encabezado, tabla
+    sin columnas y ancho según la celda más larga.
+  - `TableDecoratorTest`: recorte, mayúsculas, filtrado, composición, orden de
+    aplicación y delegado nulo.
+  - `CsvDocumentTest`: edición, orden de decoradores, vista actualizada,
+    `toText()` y `printTable()` con un printer de prueba.
+  - `CsvDocumentBuilderTest`: texto, archivo con `@TempDir`, tabla en memoria,
+    lector inyectado, formatter y printer propios, errores de configuración y
+    envoltura de `IOException`.
+  - `CsvSourceTest`: `StringCsvSource`, `PathCsvSource`, archivo inexistente y
+    `description()`.
+  - `CsvTableContractTest`: prueba parametrizada sobre las cuatro
+    implementaciones de `CsvTable`, para verificar LSP.
+  - `CsvLibraryIntegrationTest`: flujo completo, parser con otro delimitador y
+    reflejo de las ediciones en la salida.
+- Se agregó `src/test/resources/personas.csv` para las pruebas con archivos.
+
+Commits:
+
+- `test(parser): cover quotes, delimiters and edge cases`
+- `test(reader): cover headers, padding and empty input`
+- `test(table): cover row and column operations`
+- `test(formatter): verify table rendering`
+- `test(decorator): cover transformations and composition`
+- `test(document): cover editing, decorators and output`
+- `test(builder): cover sources, reader injection and errors`
+- `test(source): cover string and path sources`
+- `test(api): verify CsvTable contract for LSP`
+- `test(integration): cover end-to-end document flow`
+
 ### Extensión del builder
 
 - Se agregó `CsvDocumentBuilder.reader(CsvReader)`.
@@ -74,6 +115,6 @@ Commits:
 
 ## Pendientes
 
-- Pruebas en `src/test` (parser, lector, tabla, decoradores, documento, LSP).
 - `MarkdownTableFormatter` y `FileTablePrinter`.
+- Validaciones de encabezados duplicados y CSV de una sola fila.
 - JavaDoc completo en la API pública.

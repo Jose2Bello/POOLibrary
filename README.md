@@ -5,8 +5,9 @@ sin modificar el código base de la librería.
 
 ## Estado
 
-Proyecto en desarrollo. La API del núcleo está definida y el resto de módulos se
-integra por partes mediante Pull Requests.
+Proyecto en desarrollo. La API del núcleo está definida, el flujo completo está
+cubierto por pruebas y los módulos restantes se integran por partes mediante
+Pull Requests.
 
 ## Funcionalidades
 
@@ -46,6 +47,26 @@ Linux o macOS:
 ./mvnw test
 ./mvnw clean package
 ```
+
+### Pruebas
+
+Las pruebas están en `src/test/java` y usan JUnit 5. Cada comando
+`mvnw test` ejecuta 89 casos:
+
+| Suite | Cubre |
+|---|---|
+| `SimpleCsvParserTest` | comillas, comas dentro de comillas, comillas escapadas, saltos de línea, BOM, delimitadores, comilla sin cerrar y líneas vacías. |
+| `DefaultCsvReaderTest` | encabezado opcional, relleno de filas desiguales, CSV vacío y errores de la fuente. |
+| `DefaultCsvTableTest` | filas, columnas, celdas, copias inmutables e índices fuera de rango. |
+| `PlainTableFormatterTest` | bordes, alineación, encabezados y tabla sin columnas. |
+| `TableDecoratorTest` | recorte, mayúsculas, filtrado, composición y orden de aplicación. |
+| `CsvDocumentTest` | edición, aplicación de decoradores, `view()`, `toText()` y `printTable()`. |
+| `CsvDocumentBuilderTest` | texto, archivo, tabla en memoria, lector propio y errores de configuración. |
+| `CsvSourceTest` | `StringCsvSource`, `PathCsvSource` y archivos inexistentes. |
+| `CsvTableContractTest` | contrato común de `CsvTable` para verificar LSP. |
+| `CsvLibraryIntegrationTest` | flujo completo de lectura, decoración y salida, y extensión con otro parser. |
+
+Los datos de prueba están en `src/test/resources`.
 
 ## Arquitectura
 
@@ -225,7 +246,7 @@ POOLibrary/
 |---|---|
 | José | Arquitectura, núcleo, parser, documento y extensiones; JavaDoc. |
 | Miguel Luzardo | Redacción del informe. |
-| Santiago Salas | Todo lo demás: pruebas, formatters y printers adicionales, secciones técnicas pendientes y revisión del diagrama. |
+| Santiago Salas | Formatters y printers adicionales, validaciones, secciones técnicas pendientes y revisión del diagrama. |
 
 ## Reglas de colaboración
 
