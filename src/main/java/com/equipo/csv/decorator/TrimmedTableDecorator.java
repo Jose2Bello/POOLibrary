@@ -6,9 +6,16 @@ import java.util.List;
 
 /**
  * Elimina espacios al inicio y al final de celdas y encabezados.
+ *
+ * <p>No modifica la tabla envuelta: solo transforma los valores al leerlos.</p>
  */
 public class TrimmedTableDecorator extends AbstractTableDecorator {
 
+    /**
+     * Crea el decorador.
+     *
+     * @param delegate tabla a recortar
+     */
     public TrimmedTableDecorator(CsvTable delegate) {
         super(delegate);
     }

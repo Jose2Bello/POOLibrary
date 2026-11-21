@@ -14,6 +14,11 @@ public final class Main {
     private Main() {
     }
 
+    /**
+     * Ejecuta el ejemplo de uso de la librería.
+     *
+     * @param args argumentos de línea de comandos, no se usan
+     */
     public static void main(String[] args) {
         CsvDocument documento = CsvDocument.builder()
                 .fromString("""

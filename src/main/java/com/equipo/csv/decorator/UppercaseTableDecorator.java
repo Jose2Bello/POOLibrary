@@ -7,9 +7,17 @@ import java.util.Locale;
 
 /**
  * Convierte celdas y encabezados a mayúsculas.
+ *
+ * <p>Usa {@link Locale#ROOT} para que el resultado no dependa del idioma del
+ * sistema. No modifica la tabla envuelta.</p>
  */
 public class UppercaseTableDecorator extends AbstractTableDecorator {
 
+    /**
+     * Crea el decorador.
+     *
+     * @param delegate tabla a convertir
+     */
     public UppercaseTableDecorator(CsvTable delegate) {
         super(delegate);
     }

@@ -8,9 +8,19 @@ import java.util.Objects;
 
 /**
  * Origen CSV basado en un texto en memoria.
+ *
+ * <p>Adapta un {@link String} al contrato {@link CsvSource}, útil para pruebas y
+ * para datos que ya están cargados.</p>
+ *
+ * @param csv contenido CSV
  */
 public record StringCsvSource(String csv) implements CsvSource {
 
+    /**
+     * Valida el texto recibido.
+     *
+     * @throws NullPointerException si el texto es {@code null}
+     */
     public StringCsvSource {
         Objects.requireNonNull(csv, "csv");
     }
