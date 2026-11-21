@@ -36,6 +36,6 @@ public final class Main {
 
         System.out.println();
         System.out.println("Tabla editada:");
-        documento.printTable();
+        System.out.println(documento.toText());
     }
 }

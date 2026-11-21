@@ -69,7 +69,18 @@ public final class CsvDocument {
         return result;
     }
 
+    /**
+     * Devuelve el texto de la tabla con el formato configurado.
+     *
+     * <p>Aplica los decoradores y el {@link TableFormatter}, pero no imprime.</p>
+     *
+     * @return representación textual de la vista actual
+     */
+    public String toText() {
+        return formatter.format(view());
+    }
+
     public void printTable() {
-        printer.print(formatter.format(view()));
+        printer.print(toText());
     }
 }
