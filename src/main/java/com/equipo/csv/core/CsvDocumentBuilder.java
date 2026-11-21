@@ -23,6 +23,8 @@ import java.util.Objects;
 public final class CsvDocumentBuilder {
 
     private CsvSource source;
+    private MutableCsvTable table;
+    private CsvReader reader;
     private CsvParser parser = new SimpleCsvParser();
     private TableFormatter formatter = new PlainTableFormatter();
     private TablePrinter printer = new ConsoleTablePrinter();
@@ -48,8 +50,37 @@ public final class CsvDocumentBuilder {
         return this;
     }
 
+    /**
+     * Define la tabla ya construida que usará el documento.
+     *
+     * <p>Al usar este método no se lee ninguna fuente: el documento trabaja
+     * directamente sobre la tabla recibida, que sigue siendo mutable.</p>
+     *
+     * @param table tabla base del documento
+     * @return este builder
+     */
+    public CsvDocumentBuilder fromTable(MutableCsvTable table) {
+        this.table = Objects.requireNonNull(table, "table");
+        return this;
+    }
+
     public CsvDocumentBuilder parser(CsvParser parser) {
         this.parser = Objects.requireNonNull(parser, "parser");
+        return this;
+    }
+
+    /**
+     * Define un lector propio y omite el {@code DefaultCsvReader} interno.
+     *
+     * <p>Cuando se usa este método, {@link #parser(CsvParser)} y
+     * {@link #firstRowIsHeader(boolean)} dejan de aplicarse, porque el lector
+     * recibido es el responsable de construir la tabla.</p>
+     *
+     * @param reader lector que convertirá la fuente en tabla
+     * @return este builder
+     */
+    public CsvDocumentBuilder reader(CsvReader reader) {
+        this.reader = Objects.requireNonNull(reader, "reader");
         return this;
     }
 
@@ -74,18 +105,34 @@ public final class CsvDocumentBuilder {
     }
 
     public CsvDocument build() {
-        if (source == null) {
+        if (table != null && source != null) {
             throw new IllegalStateException(
-                    "Debe indicar un origen CSV con from(Path) o fromString(String)");
+                    "Use from(Path), fromString(String) o fromTable(MutableCsvTable), no ambos");
         }
 
-        CsvReader reader = new DefaultCsvReader(parser, firstRowIsHeader);
+        if (table != null) {
+            return createDocument(table);
+        }
+
+        if (source == null) {
+            throw new IllegalStateException(
+                    "Debe indicar un origen CSV con from(Path), fromString(String) "
+                            + "o una tabla con fromTable(MutableCsvTable)");
+        }
+
+        CsvReader effectiveReader = reader != null
+                ? reader
+                : new DefaultCsvReader(parser, firstRowIsHeader);
+
         try {
-            MutableCsvTable table = reader.read(source);
-            return new CsvDocument(table, decorators, formatter, printer);
+            return createDocument(effectiveReader.read(source));
         } catch (IOException exception) {
             throw new CsvLibraryException(
                     "No se pudo leer el CSV: " + source.description(), exception);
         }
+    }
+
+    private CsvDocument createDocument(MutableCsvTable data) {
+        return new CsvDocument(data, decorators, formatter, printer);
     }
 }
