@@ -86,4 +86,10 @@ class DefaultCsvReaderTest {
 
         assertEquals("sin acceso", error.getMessage());
     }
+
+    @Test
+    @DisplayName("rechaza encabezados duplicados en el CSV")
+    void rechazaEncabezadosDuplicados() {
+        assertThrows(IllegalArgumentException.class, () -> read("a,A\n1,2", true));
+    }
 }

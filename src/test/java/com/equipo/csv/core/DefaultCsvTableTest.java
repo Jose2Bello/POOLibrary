@@ -177,4 +177,66 @@ class DefaultCsvTableTest {
 
         assertFalse(tabla.hasHeaders());
     }
+
+    @Test
+    @DisplayName("rechaza encabezados duplicados")
+    void rechazaEncabezadosDuplicados() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new DefaultCsvTable(
+                        List.of("nombre", "nombre"),
+                        List.of(List.of("Ana", "Luis"))));
+    }
+
+    @Test
+    @DisplayName("detecta duplicados ignorando mayusculas y espacios")
+    void detectaDuplicadosSinImportarFormato() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new DefaultCsvTable(
+                        List.of("Nombre", " nombre "),
+                        List.of(List.of("Ana", "Luis"))));
+    }
+
+    @Test
+    @DisplayName("permite encabezados vacios repetidos")
+    void permiteEncabezadosVacios() {
+        DefaultCsvTable tabla = new DefaultCsvTable(
+                List.of("a", "", ""),
+                List.of(List.of("1", "2", "3")));
+
+        assertEquals(List.of("a", "", ""), tabla.headers());
+    }
+
+    @Test
+    @DisplayName("rechaza agregar una columna con encabezado duplicado")
+    void rechazaColumnaDuplicada() {
+        DefaultCsvTable tabla = tabla();
+
+        assertThrows(IllegalArgumentException.class, () -> tabla.addColumn("NOMBRE"));
+    }
+
+    @Test
+    @DisplayName("rechaza valores nulos")
+    void rechazaValoresNulos() {
+        DefaultCsvTable tabla = tabla();
+
+        assertThrows(NullPointerException.class, () -> tabla.addRow(java.util.Arrays.asList("Ana", null)));
+        assertThrows(
+                NullPointerException.class,
+                () -> new DefaultCsvTable(
+                        List.of("a", "b"),
+                        List.of(java.util.Arrays.asList("1", null))));
+        assertThrows(
+                NullPointerException.class,
+                () -> tabla.addColumn("ciudad", java.util.Arrays.asList("Madrid", null)));
+    }
+
+    @Test
+    @DisplayName("rechaza un encabezado nulo al agregar una columna")
+    void rechazaEncabezadoNulo() {
+        DefaultCsvTable tabla = tabla();
+
+        assertThrows(NullPointerException.class, () -> tabla.addColumn(null, List.of("a", "b")));
+    }
 }
