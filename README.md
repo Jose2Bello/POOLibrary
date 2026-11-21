@@ -15,7 +15,8 @@ Pull Requests.
 - Representar filas, columnas, celdas y encabezados como `String`.
 - Agregar, eliminar y modificar filas.
 - Agregar, eliminar y modificar columnas.
-- Imprimir la tabla en consola.
+- Imprimir la tabla en consola, en un archivo o en memoria.
+- Elegir entre formato de texto plano o Markdown.
 - Cambiar el formato de salida sin modificar la librería.
 - Cambiar el destino de impresión: consola, archivo o memoria.
 - Aplicar transformaciones propias mediante decoradores.
@@ -51,14 +52,17 @@ Linux o macOS:
 ### Pruebas
 
 Las pruebas están en `src/test/java` y usan JUnit 5. Cada comando
-`mvnw test` ejecuta 89 casos:
+`mvnw test` ejecuta 112 casos:
 
 | Suite | Cubre |
 |---|---|
 | `SimpleCsvParserTest` | comillas, comas dentro de comillas, comillas escapadas, saltos de línea, BOM, delimitadores, comilla sin cerrar y líneas vacías. |
-| `DefaultCsvReaderTest` | encabezado opcional, relleno de filas desiguales, CSV vacío y errores de la fuente. |
-| `DefaultCsvTableTest` | filas, columnas, celdas, copias inmutables e índices fuera de rango. |
+| `DefaultCsvReaderTest` | encabezado opcional, relleno de filas desiguales, CSV vacío, encabezados duplicados y errores de la fuente. |
+| `DefaultCsvTableTest` | filas, columnas, celdas, copias inmutables, índices fuera de rango y validación de encabezados y valores nulos. |
 | `PlainTableFormatterTest` | bordes, alineación, encabezados y tabla sin columnas. |
+| `MarkdownTableFormatterTest` | tabla Markdown, escape de `|`, saltos de línea, ancho mínimo y tabla vacía. |
+| `FileTablePrinterTest` | escritura y adición al archivo, charset y errores de escritura. |
+| `MemoryTablePrinterTest` | texto acumulado, separador configurable, limpieza e integración con el documento. |
 | `TableDecoratorTest` | recorte, mayúsculas, filtrado, composición y orden de aplicación. |
 | `CsvDocumentTest` | edición, aplicación de decoradores, `view()`, `toText()` y `printTable()`. |
 | `CsvDocumentBuilderTest` | texto, archivo, tabla en memoria, lector propio y errores de configuración. |
@@ -90,6 +94,25 @@ com.equipo.csv
 - `TableFormatter`: representación de la tabla como texto.
 - `TablePrinter`: salida del texto generado.
 - `TableDecoratorFactory`: creación de decoradores de tabla.
+
+### Implementaciones incluidas
+
+| Componente | Implementaciones |
+|---|---|
+| `CsvSource` | `PathCsvSource`, `StringCsvSource` |
+| `CsvParser` | `SimpleCsvParser` con delimitador configurable |
+| `CsvReader` | `DefaultCsvReader` |
+| `CsvTable` | `DefaultCsvTable` |
+| `TableFormatter` | `PlainTableFormatter`, `MarkdownTableFormatter` |
+| `TablePrinter` | `ConsoleTablePrinter`, `FileTablePrinter`, `MemoryTablePrinter` |
+| `TableDecoratorFactory` | `TrimmedTableDecorator`, `UppercaseTableDecorator`, `FilteredTableDecorator` |
+
+### Validaciones
+
+`DefaultCsvTable` rechaza filas con un número de columnas distinto, valores nulos
+y encabezados duplicados. La comparación de encabezados ignora mayúsculas y
+espacios en los extremos. Los encabezados vacíos se permiten porque el lector
+los usa al rellenar columnas sin nombre.
 
 ### SOLID
 
@@ -209,8 +232,8 @@ documento.printTable();
 
 Otros puntos de extensión:
 
-- `TableFormatter` para Markdown, HTML o JSON.
-- `TablePrinter` para archivo o memoria.
+- `TableFormatter` para HTML o JSON.
+- `TablePrinter` para otros destinos de salida.
 - `CsvParser` para otro delimitador o formato.
 - `CsvReader` para una carga completa distinta, inyectada con `reader(...)`.
 - `TableDecoratorFactory` para transformaciones adicionales.
