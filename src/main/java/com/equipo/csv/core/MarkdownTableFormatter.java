@@ -17,6 +17,15 @@ public class MarkdownTableFormatter implements TableFormatter {
 
     private static final int MIN_WIDTH = 3;
 
+    /**
+     * Crea el formateador Markdown.
+     */
+    public MarkdownTableFormatter() {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String format(CsvTable table) {
         if (table.columnCount() == 0) {

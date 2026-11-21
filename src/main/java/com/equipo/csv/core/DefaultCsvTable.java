@@ -17,6 +17,9 @@ import java.util.Set;
  * encabezados vacíos se permiten y no participan en la detección de duplicados,
  * porque el lector los usa para rellenar columnas sin nombre. La comparación de
  * encabezados ignora mayúsculas y espacios en los extremos.</p>
+ *
+ * <p>La tabla copia los datos que recibe y devuelve copias inmutables, de modo
+ * que el estado interno no se puede alterar desde fuera.</p>
  */
 public class DefaultCsvTable implements MutableCsvTable {
 
@@ -24,6 +27,17 @@ public class DefaultCsvTable implements MutableCsvTable {
     private final List<List<String>> rows;
     private final boolean hasHeaders;
 
+    /**
+     * Crea una tabla validando encabezados y filas.
+     *
+     * @param headers    nombres de las columnas
+     * @param rows       filas de datos; cada una debe tener el mismo tamaño que
+     *                   {@code headers}
+     * @param hasHeaders indica si la primera fila del CSV era el encabezado
+     * @throws IllegalArgumentException si alguna fila no coincide en tamaño o si
+     *                                  hay encabezados duplicados
+     * @throws NullPointerException     si hay listas, encabezados o valores nulos
+     */
     public DefaultCsvTable(List<String> headers, List<List<String>> rows, boolean hasHeaders) {
         this.headers = new ArrayList<>(Objects.requireNonNull(headers, "headers"));
         validateHeaders(this.headers);
@@ -39,6 +53,15 @@ public class DefaultCsvTable implements MutableCsvTable {
         this.hasHeaders = hasHeaders;
     }
 
+    /**
+     * Crea una tabla que declara tener encabezados.
+     *
+     * @param headers nombres de las columnas
+     * @param rows    filas de datos
+     * @throws IllegalArgumentException si alguna fila no coincide en tamaño o si
+     *                                  hay encabezados duplicados
+     * @throws NullPointerException     si hay listas, encabezados o valores nulos
+     */
     public DefaultCsvTable(List<String> headers, List<List<String>> rows) {
         this(headers, rows, true);
     }

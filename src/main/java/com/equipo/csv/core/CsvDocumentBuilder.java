@@ -19,6 +19,15 @@ import java.util.Objects;
 
 /**
  * Construye un {@link CsvDocument} con componentes configurables.
+ *
+ * <p>Permite elegir el origen de datos, el parser, el lector, el formateador, el
+ * impresor y los decoradores. Si no se configura algo, se usan valores por
+ * defecto: {@link SimpleCsvParser}, {@link PlainTableFormatter} y
+ * {@link ConsoleTablePrinter}.</p>
+ *
+ * <p>El documento se puede construir de dos formas excluyentes: desde una fuente
+ * CSV ({@link #from(Path)}, {@link #fromString(String)} o {@link #source(CsvSource)})
+ * o desde una tabla ya creada ({@link #fromTable(MutableCsvTable)}).</p>
  */
 public final class CsvDocumentBuilder {
 
@@ -31,20 +40,49 @@ public final class CsvDocumentBuilder {
     private final List<TableDecoratorFactory> decorators = new ArrayList<>();
     private boolean firstRowIsHeader = true;
 
+    /**
+     * Crea un builder vacío.
+     */
+    public CsvDocumentBuilder() {
+    }
+
+    /**
+     * Crea un builder vacío.
+     *
+     * @return nuevo builder
+     */
     public static CsvDocumentBuilder builder() {
         return new CsvDocumentBuilder();
     }
 
+    /**
+     * Lee el CSV desde un archivo en UTF-8.
+     *
+     * @param path ruta del archivo
+     * @return este builder
+     */
     public CsvDocumentBuilder from(Path path) {
         this.source = new PathCsvSource(path);
         return this;
     }
 
+    /**
+     * Lee el CSV desde un texto en memoria.
+     *
+     * @param csv contenido CSV
+     * @return este builder
+     */
     public CsvDocumentBuilder fromString(String csv) {
         this.source = new StringCsvSource(csv);
         return this;
     }
 
+    /**
+     * Usa una fuente CSV personalizada.
+     *
+     * @param source origen de los datos
+     * @return este builder
+     */
     public CsvDocumentBuilder source(CsvSource source) {
         this.source = Objects.requireNonNull(source, "source");
         return this;
@@ -64,6 +102,12 @@ public final class CsvDocumentBuilder {
         return this;
     }
 
+    /**
+     * Configura el parser usado por el lector por defecto.
+     *
+     * @param parser parser que separa el texto en filas
+     * @return este builder
+     */
     public CsvDocumentBuilder parser(CsvParser parser) {
         this.parser = Objects.requireNonNull(parser, "parser");
         return this;
@@ -84,26 +128,60 @@ public final class CsvDocumentBuilder {
         return this;
     }
 
+    /**
+     * Configura el formateador de salida.
+     *
+     * @param formatter formateador de la tabla
+     * @return este builder
+     */
     public CsvDocumentBuilder formatter(TableFormatter formatter) {
         this.formatter = Objects.requireNonNull(formatter, "formatter");
         return this;
     }
 
+    /**
+     * Configura el destino de la salida.
+     *
+     * @param printer impresor de la tabla
+     * @return este builder
+     */
     public CsvDocumentBuilder printer(TablePrinter printer) {
         this.printer = Objects.requireNonNull(printer, "printer");
         return this;
     }
 
+    /**
+     * Agrega un decorador a la vista del documento.
+     *
+     * <p>Los decoradores se aplican en el mismo orden en que se agregan.</p>
+     *
+     * @param decorator fábrica de decoradores
+     * @return este builder
+     */
     public CsvDocumentBuilder decorate(TableDecoratorFactory decorator) {
         decorators.add(Objects.requireNonNull(decorator, "decorator"));
         return this;
     }
 
+    /**
+     * Indica si la primera fila del CSV contiene los encabezados.
+     *
+     * @param firstRowIsHeader {@code true} para tomar la primera fila como encabezado
+     * @return este builder
+     */
     public CsvDocumentBuilder firstRowIsHeader(boolean firstRowIsHeader) {
         this.firstRowIsHeader = firstRowIsHeader;
         return this;
     }
 
+    /**
+     * Crea el documento con la configuración acumulada.
+     *
+     * @return documento listo para usarse
+     * @throws IllegalStateException si no se indicó origen ni tabla, o si se
+     *                               indicaron ambos
+     * @throws CsvLibraryException   si falla la lectura del CSV
+     */
     public CsvDocument build() {
         if (table != null && source != null) {
             throw new IllegalStateException(

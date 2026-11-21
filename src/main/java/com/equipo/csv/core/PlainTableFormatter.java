@@ -8,8 +8,18 @@ import java.util.List;
 
 /**
  * Formateador de tabla en texto plano con bordes y columnas alineadas.
+ *
+ * <p>Calcula el ancho de cada columna a partir del contenido y dibuja una tabla
+ * con bordes {@code +}, {@code -} y {@code |}. Si la tabla no tiene columnas
+ * devuelve {@code "(tabla vacia)"}.</p>
  */
 public class PlainTableFormatter implements TableFormatter {
+
+    /**
+     * Crea el formateador de texto plano.
+     */
+    public PlainTableFormatter() {
+    }
 
     @Override
     public String format(CsvTable table) {

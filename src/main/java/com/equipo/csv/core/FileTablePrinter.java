@@ -22,15 +22,29 @@ public class FileTablePrinter implements TablePrinter {
     private final Path path;
     private final Charset charset;
 
+    /**
+     * Crea el impresor escribiendo en UTF-8.
+     *
+     * @param path archivo de destino
+     */
     public FileTablePrinter(Path path) {
         this(path, StandardCharsets.UTF_8);
     }
 
+    /**
+     * Crea el impresor con un charset propio.
+     *
+     * @param path    archivo de destino
+     * @param charset codificación de escritura
+     */
     public FileTablePrinter(Path path, Charset charset) {
         this.path = Objects.requireNonNull(path, "path");
         this.charset = Objects.requireNonNull(charset, "charset");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void print(String text) {
         Objects.requireNonNull(text, "text");
