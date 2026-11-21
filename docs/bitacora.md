@@ -50,6 +50,21 @@ Commits:
 
 - `docs: document builder extensions in README`
 
+### Diagrama de clases
+
+- Se regeneró `docs/diagrama-clases.drawio` para que coincida con el código:
+  - `CsvDocument`: se agregó `+setCell(...)`, `+view()` y `+toText()`.
+  - `CsvDocumentBuilder`: se agregaron los atributos `-table` y `-reader`, y los
+    métodos `+fromTable(...)` y `+reader(...)`.
+- La leyenda ahora se posiciona debajo de la caja más baja en vez de tener una
+  coordenada fija, así que no se solapa cuando las cajas crecen.
+- Se validó el resultado: 24 clases sin solapamientos, 28 flechas con segmentos
+  ortogonales y ninguna ruta que cruce una caja o la leyenda.
+
+Commits:
+
+- `docs(diagram): update class diagram with new builder and document API`
+
 ## 2026-11-20 (organización)
 
 - El README ahora indica el reparto real del equipo: José en arquitectura y
