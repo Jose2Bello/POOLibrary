@@ -19,6 +19,9 @@ integra por partes mediante Pull Requests.
 - Cambiar el destino de impresión: consola, archivo o memoria.
 - Aplicar transformaciones propias mediante decoradores.
 - Cambiar el parseo del CSV con una nueva implementación de `CsvParser`.
+- Inyectar un lector propio con `CsvReader`.
+- Construir un documento desde una tabla ya cargada en memoria.
+- Obtener la tabla como texto sin imprimirla.
 
 ## Stack
 
@@ -114,6 +117,42 @@ documento.printTable();
 
 También se puede cargar desde texto con `CsvLibrary.parse(...)`.
 
+### Salida como texto
+
+`toText()` aplica los decoradores y el formateador, pero no imprime:
+
+```java
+String texto = documento.toText();
+```
+
+### Documento desde una tabla en memoria
+
+Si la tabla ya existe, no hace falta una fuente CSV:
+
+```java
+DefaultCsvTable tabla = new DefaultCsvTable(
+        List.of("Nombre", "Ciudad"),
+        List.of(List.of("Ana", "Madrid")));
+
+CsvDocument documento = CsvDocument.builder()
+        .fromTable(tabla)
+        .build();
+```
+
+### Lector propio
+
+El builder usa `DefaultCsvReader` por defecto. Para cambiarlo:
+
+```java
+CsvDocument documento = CsvDocument.builder()
+        .from(Path.of("datos.csv"))
+        .reader(new MiCsvReader())
+        .build();
+```
+
+Al inyectar un `CsvReader`, el `parser(...)` y el `firstRowIsHeader(...)`
+del builder ya no se usan: el lector recibido es el que construye la tabla.
+
 ## Extensión
 
 Un decorador propio se crea extendiendo `AbstractTableDecorator`:
@@ -152,6 +191,7 @@ Otros puntos de extensión:
 - `TableFormatter` para Markdown, HTML o JSON.
 - `TablePrinter` para archivo o memoria.
 - `CsvParser` para otro delimitador o formato.
+- `CsvReader` para una carga completa distinta, inyectada con `reader(...)`.
 - `TableDecoratorFactory` para transformaciones adicionales.
 
 ## Estructura del repositorio
