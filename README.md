@@ -181,11 +181,11 @@ POOLibrary/
 
 ## Equipo y pendientes
 
-| Integrante | Pendientes principales |
+| Integrante | Responsabilidad actual |
 |---|---|
-| José | Subir parser, documento y extensiones; completar JavaDoc; escribir introducción, arquitectura y SOLID del informe; revisar PRs. |
-| Integrante 2 | Pruebas de parser, lector y tabla; crear `SemicolonCsvParser`; escribir pruebas y LSP en el informe. |
-| Integrante 3 | Crear `MarkdownTableFormatter` y `FileTablePrinter`; probar decoradores; hacer el diagrama y la sección de patrones. |
+| José | Arquitectura, núcleo, parser, documento y extensiones; JavaDoc. |
+| Miguel Luzardo | Redacción del informe. |
+| Santiago Salas | Todo lo demás: pruebas, formatters y printers adicionales, secciones técnicas pendientes y revisión del diagrama. |
 
 ## Reglas de colaboración
 
