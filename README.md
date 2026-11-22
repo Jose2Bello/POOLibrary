@@ -16,7 +16,8 @@ Pull Requests.
 - Agregar, eliminar y modificar filas.
 - Agregar, eliminar y modificar columnas.
 - Imprimir la tabla en consola, en un archivo o en memoria.
-- Elegir entre formato de texto plano o Markdown.
+- Elegir entre formato de texto plano, Markdown o CSV.
+- Exportar la tabla de vuelta a CSV respetando comillas y saltos de línea.
 - Cambiar el formato de salida sin modificar la librería.
 - Cambiar el destino de impresión: consola, archivo o memoria.
 - Aplicar transformaciones propias mediante decoradores.
@@ -52,7 +53,7 @@ Linux o macOS:
 ### Pruebas
 
 Las pruebas están en `src/test/java` y usan JUnit 5. Cada comando
-`mvnw test` ejecuta 112 casos:
+`mvnw test` ejecuta 121 casos:
 
 | Suite | Cubre |
 |---|---|
@@ -61,6 +62,7 @@ Las pruebas están en `src/test/java` y usan JUnit 5. Cada comando
 | `DefaultCsvTableTest` | filas, columnas, celdas, copias inmutables, índices fuera de rango y validación de encabezados y valores nulos. |
 | `PlainTableFormatterTest` | bordes, alineación, encabezados y tabla sin columnas. |
 | `MarkdownTableFormatterTest` | tabla Markdown, escape de `|`, saltos de línea, ancho mínimo y tabla vacía. |
+| `CsvTableFormatterTest` | exportación a CSV, delimitador, comillas, saltos de línea y lectura de ida y vuelta. |
 | `FileTablePrinterTest` | escritura y adición al archivo, charset y errores de escritura. |
 | `MemoryTablePrinterTest` | texto acumulado, separador configurable, limpieza e integración con el documento. |
 | `TableDecoratorTest` | recorte, mayúsculas, filtrado, composición y orden de aplicación. |
@@ -103,7 +105,7 @@ com.equipo.csv
 | `CsvParser` | `SimpleCsvParser` con delimitador configurable |
 | `CsvReader` | `DefaultCsvReader` |
 | `CsvTable` | `DefaultCsvTable` |
-| `TableFormatter` | `PlainTableFormatter`, `MarkdownTableFormatter` |
+| `TableFormatter` | `PlainTableFormatter`, `MarkdownTableFormatter`, `CsvTableFormatter` |
 | `TablePrinter` | `ConsoleTablePrinter`, `FileTablePrinter`, `MemoryTablePrinter` |
 | `TableDecoratorFactory` | `TrimmedTableDecorator`, `UppercaseTableDecorator`, `FilteredTableDecorator` |
 
@@ -168,6 +170,23 @@ También se puede cargar desde texto con `CsvLibrary.parse(...)`.
 ```java
 String texto = documento.toText();
 ```
+
+### Exportar a CSV
+
+`CsvTableFormatter` convierte la vista de vuelta a CSV, con las comillas y los
+saltos de línea escapados según RFC 4180:
+
+```java
+CsvDocument documento = CsvDocument.builder()
+        .from(Path.of("datos.csv"))
+        .formatter(new CsvTableFormatter())
+        .printer(new FileTablePrinter(Path.of("salida.csv")))
+        .build();
+
+documento.printTable();
+```
+
+El delimitador es configurable: `new CsvTableFormatter(';')`.
 
 ### Documento desde una tabla en memoria
 
@@ -237,6 +256,22 @@ Otros puntos de extensión:
 - `CsvParser` para otro delimitador o formato.
 - `CsvReader` para una carga completa distinta, inyectada con `reader(...)`.
 - `TableDecoratorFactory` para transformaciones adicionales.
+
+### Reglas para extender
+
+Las extensiones viven en un paquete propio y no requieren cambios en
+`com.equipo.csv.core`. Para que una implementación encaje con el resto de la
+librería conviene respetar el contrato:
+
+- `CsvTable` devuelve copias inmutables y lanza `IndexOutOfBoundsException` fuera de rango.
+- Un decorador no muta la tabla envuelta: transforma lo que devuelve.
+- `headers()` conserva tantos elementos como `columnCount()`, aunque `hasHeaders()` sea `false`.
+- Un `CsvParser` no cierra el `Reader`; de eso se encarga el lector.
+- Un `TablePrinter` envuelve `IOException` en `CsvLibraryException`.
+- Un `TableFormatter` devuelve texto y no imprime.
+
+`CsvTableContractTest` sirve como plantilla para validar una implementación nueva
+de `CsvTable`.
 
 ## Estructura del repositorio
 
