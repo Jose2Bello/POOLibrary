@@ -304,10 +304,3 @@ POOLibrary/
 | José | Arquitectura, núcleo, parser, documento y extensiones; JavaDoc. |
 | Miguel Luzardo | Redacción del informe. |
 | Santiago Salas | Formatters y printers adicionales, validaciones, secciones técnicas pendientes y revisión del diagrama. |
-
-## Reglas de colaboración
-
-- No hacer commits directamente sobre `main`.
-- Usar una rama por funcionalidad y abrir un Pull Request.
-- Ejecutar `.\mvnw.cmd test` o `./mvnw test` antes del PR.
-- Mantener el README actualizado si cambia la API.
