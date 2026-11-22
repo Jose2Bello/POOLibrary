@@ -294,7 +294,6 @@ POOLibrary/
 │       ├── java/com/equipo/csv/
 │       └── resources/
 └── docs/
-    ├── informe.md
     └── diagrama-clases.drawio
 ```
 
